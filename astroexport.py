@@ -10,7 +10,7 @@ module_loader_name = "MyModuleLoader"
 
 class JSModule:
     import_regex = r'import\{(\w+(?: as \w+)?(?:,\w+(?: as \w+)?)*)\}from"(.+?)"'
-    simple_import_regex = r'import"(.+)"'
+    simple_import_regex = r'import"(.+?)"'
     export_regex = r'export\{(\w+(?: as \w+)?(?:,\w+(?: as \w+)?)*)\}'
 
     loaded_modules: Dict[Path, Self] = {}
