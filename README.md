@@ -15,3 +15,5 @@ This little script solves the problem
 - All dependencies are awaited with Timeouts.
 - The render code is modified to load the correct files from the urls instead of dynamically importing them and causing cors errors
 - Once everything has been loaded the renderer will execute and hydrate all your components
+
+Tested with "astro": "^5.5.6", "react": "^19.1.0". For other versions you might need to adjust the renderer replacement text a bit as it searches for an exact match and if variables are renamed this will fail.
