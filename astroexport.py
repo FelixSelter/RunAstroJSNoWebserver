@@ -11,7 +11,7 @@ module_loader_name = "MyModuleLoader"
 class JSModule:
     import_regex = r'import\{(\w+(?: as \w+)?(?:,\w+(?: as \w+)?)*)\}from"(.+?)"'
     simple_import_regex = r'import"(.+?)"'
-    export_regex = r'export\{(\w+(?: as \w+)?(?:,\w+(?: as \w+)?)*)\}'
+    export_regex = r'export\{(.+(?: as \w+)?(?:,\w+(?: as \w+)?)*)\}'
 
     loaded_modules: Dict[Path, Self] = {}
 
@@ -54,8 +54,7 @@ class JSModule:
             print(f"\t\t- Found imports from {import_src}: {imports}")
             m = JSModule.load(src.parent / import_src)
             self.dependencies.append(m)
-            new_import = "const {"+",".join(i[0] if len(
-                i) == 0 else f'{i[0]}:{i[1]}' for i in imports)+f"}} = window.{module_loader_name}['{m.id}']"
+            new_import = "const {"+",".join(i[0] if len(i) == 1 else f'{i[0]}:{i[1]}' for i in imports)+f"}} = window.{module_loader_name}['{m.id}']"
             src_code = src_code.replace(import_match.group(0), new_import)
 
         # Find polyfill imports that only execute top level code
@@ -70,6 +69,8 @@ class JSModule:
             f"!window.{module_loader_name}[\"{dep.id}\"]" for dep in self.dependencies]
         await_statement = f'while ({" || ".join(awaited_imports)}) {{console.log("{module_loader_name} module {self.id} waiting for {", ".join([str(dep.id) for dep in self.dependencies])}");await new Promise(r => setTimeout(r, 50)); console.log("{module_loader_name} loaded module {self.id}")}}' if not len(
             self.dependencies) == 0 else ""
+        
+        
         self.module_code = f'<script type="module">if(window.{module_loader_name}===undefined)window.{module_loader_name}={{}};' + \
             await_statement+src_code+"</script>"
 
